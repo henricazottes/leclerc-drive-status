@@ -1,7 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import { StyleSheet, Text, View, Button, Image } from 'react-native';
+import { StyleSheet, Text, View, Button } from 'react-native';
 import { Notifications } from 'expo';
 import axios from 'axios';
+import Constants from "expo-constants";
+
+import HistoryStatusList from './components/historyStatusList';
 
 const getLocalNotification = (isAvailable) => ({
   title: `Leclerc Drive Status ${isAvailable ? '🟢' : '🔴'}`,
@@ -45,10 +48,17 @@ function triggerNotification(isAvailable) {
 export default function App() {
   const [available, setAvailable] = useState(false);
   const [loading, setLoading] = useState(false);
-  const statusText = `Status: ${available ? 'Available' : 'Not Available'}`;
+  const statusText = `${available ? 'Available 🟢' : 'Not Available 🔴'}`;
 
   return (
     <View style={styles.container}>
+      <Text style={styles.lastStatus}>Last Status: 
+        {loading
+        ? ' Loading...'
+        : ` ${statusText}`
+        }
+      </Text>
+      <HistoryStatusList items={[{date: new Date(), isAvailable: false}]} />
       <Button
         title='Reload'
         onPress={() => {
@@ -57,10 +67,6 @@ export default function App() {
       >
         Reload
       </Button>
-      {loading
-      ? <Text>Loading...</Text>
-      : <Text>{statusText}</Text>
-      }
     </View>
   );
 }
@@ -69,7 +75,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginHorizontal: 16,
+    paddingTop: Constants.statusBarHeight,
+    marginBottom: 10,
   },
+  lastStatus: {
+    textAlign: 'center',
+    fontSize: 20,
+    marginTop: 20,
+  }
 });
